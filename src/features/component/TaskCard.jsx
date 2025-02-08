@@ -1,8 +1,15 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../components/ui/card"
 import { Button } from "../../components/ui/button"
 import { ChevronRight, Plus, Pencil, Trash } from "lucide-react"
+import { useState } from "react"
+import { useTasks } from "../tasks/hooks/useTasks"
 
-const TaskCard = ({ task, onEdit, onDelete, onAddSubtask}) => {
+const TaskCard = ({ task, onEdit, onDelete, onAddSubtask, disabled}) => {
+
+    const [showSubtasks, setShowSubtasks] = useState(false)
+    const { useSubTaskQuery } = useTasks()
+    const {data: subtasksData, isLoading: isSubtasksLoading} = useSubTaskQuery(showSubtasks ? task.id : null)
+
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
@@ -38,10 +45,11 @@ const TaskCard = ({ task, onEdit, onDelete, onAddSubtask}) => {
                             </div>
                         </div>
                         <div className="flex gap-2">
-                            <Button variant="ghost" size="icon" onClick={() => onEdit(task)}>
+                            <Button 
+                                variant="ghost" size="icon" onClick={() => onEdit(task)} disabled={disabled}>
                                 <Pencil className="h-4 w-4"></Pencil>
                             </Button>
-                            <Button variant="ghost" size="icon" onClick={() => onDelete(task)}>
+                            <Button variant="ghost" size="icon" onClick={() => onDelete(task)} disabled={disabled}>
                                 <Trash className="h-4 w-4"></Trash>
                             </Button>
                         </div>
@@ -57,17 +65,48 @@ const TaskCard = ({ task, onEdit, onDelete, onAddSubtask}) => {
                             Due: {formatDate(task.due_date)}
                         </span>
                         <div className="flex gap-2">
-                            <Button variant="outline" size="sm" onClick={() => onAddSubtask(task.id)}>
+                            <Button variant="outline" size="sm" onClick={() => onAddSubtask(task)} disabled={disabled}>
                                 <Plus className="h-4 w-4 mr-1"/>
                                     Add Subtask
                             </Button>
-                           g
+                            
+                            {task.sub_tasks?.length > 0 && (
+                                <Button 
+                                    variant="ghost" 
+                                    size="sm"
+                                    onClick={() => setShowSubtasks(!showSubtasks)}
+                                    disabled={disabled}
+                                >
+                                    <ChevronRight className={`h-4 w-4 mr-1 transform transition-transform ${showSubtasks ? 'rotate-90' : ''}`} />
+                                    {showSubtasks ? 'Hide Subtasks' : 'View Subtasks'}
+                                </Button>
+                            )}
+                           
                         </div>
                     </div>
-
                 </CardContent>
-
             </Card>
+            {showSubtasks && (
+                <div className="ml-8 mt-4 border space-y-4 ">
+                    {isSubtasksLoading ? (
+                        <div>Loading subtasks...</div>
+                    ) : (
+                        subtasksData?.data?.map((subtask) => (
+                            <TaskCard
+                                key={subtask.id}
+                                task={subtask}
+                                onEdit={onEdit}
+                                onDelete={onDelete}
+                                onAddSubtask={onAddSubtask}
+                                disabled={disabled}
+
+                            />
+                        ))
+
+                    )}
+
+                </div>
+            )}
         </div>
     )
 
