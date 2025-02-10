@@ -6,7 +6,8 @@ import { useTasks } from "../tasks/hooks/useTasks"
 
 const TaskCard = ({ task, onEdit, onDelete, onAddSubtask, disabled}) => {
 
-    const [showSubtasks, setShowSubtasks] = useState(false)
+    const [showSubtasks, setShowSubtasks] = useState(true)
+    const [showSubtaskForm, setShowSubtaskForm] = useState(false)
     const { useSubTaskQuery } = useTasks()
     const {data: subtasksData, isLoading: isSubtasksLoading} = useSubTaskQuery(showSubtasks ? task.id : null)
 
@@ -87,7 +88,7 @@ const TaskCard = ({ task, onEdit, onDelete, onAddSubtask, disabled}) => {
                 </CardContent>
             </Card>
             {showSubtasks && (
-                <div className="ml-8 mt-4 border space-y-4 ">
+                <div className="ml-8 mt-4 space-y-4">
                     {isSubtasksLoading ? (
                         <div>Loading subtasks...</div>
                     ) : (
@@ -99,7 +100,7 @@ const TaskCard = ({ task, onEdit, onDelete, onAddSubtask, disabled}) => {
                                 onDelete={onDelete}
                                 onAddSubtask={onAddSubtask}
                                 disabled={disabled}
-
+                                
                             />
                         ))
 

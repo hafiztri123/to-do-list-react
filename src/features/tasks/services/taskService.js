@@ -1,11 +1,11 @@
 import { BASE_URL, TOKEN } from "../../../constant/api";
 
-const BASE_HEADERS = {
+export const BASE_HEADERS = {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${TOKEN}`,
 };
 
-async function fetcher(endpoint, options = {}) {
+export async function fetcher(endpoint, options = {}) {
     const response = await fetch(`${BASE_URL}/${endpoint}`, options); 
 
     if (!response.ok) {
@@ -13,7 +13,12 @@ async function fetcher(endpoint, options = {}) {
         throw new Error(`[${errorData.code}] ${errorData.message}`);
     }
 
-    return response.json(); 
+    // Only try to parse JSON if there's content
+    if (response.status !== 204) {
+        return response.json();
+    }
+    
+    return null; // For 204 No Content responses
 }
 
 export const taskService = {

@@ -1,13 +1,13 @@
 // features/tasks/components/TaskTest.jsx
 
-import { useQuery } from "@tanstack/react-query"
 import { BASE_URL, TOKEN } from "../../constant/api"
 import TaskCard from "./TaskCard"
 import { Alert, AlertDescription } from "../../components/ui/alert"
 import { useTasks } from "../tasks/hooks/useTasks"
+import CreateTaskForm from "./CreateTaskForm"
 
 
-function TaskTest() {
+function TaskTest({ selectedCategoryId }) {
     const {
         tasks,
         isLoading,
@@ -18,12 +18,19 @@ function TaskTest() {
         isCreating,
         isUpdating,
         isDeleting,
-        useSubTaskQuery,
     } = useTasks()
 
     
     
 
+    const handleCreateTask = (taskData) => {
+        const task = {
+            ...taskData,
+            status: 'pending'
+        }
+
+        createTask({ task })
+    }
 
     const handleEdit = (task) => {
         const updates = {
@@ -44,7 +51,7 @@ function TaskTest() {
                 console.error(error)
             }
         }
-    }
+    }   
 
     const handleAddSubtask = (task) => {
         const newTask = {
@@ -52,7 +59,8 @@ function TaskTest() {
             title: "New Subtask",
             description: "Description for new subtask",
             due_date: new Date().toISOString(),
-            status: "pending"
+            status: "pending",
+            category_id: task.category_id
         }
 
         createTask({ task: newTask })
@@ -70,8 +78,13 @@ function TaskTest() {
 
 
     return (
-        <div className="grid gap-6">
-            {tasks?.map(task => (
+        <div className="space-y-6">
+            <CreateTaskForm
+                onCreateTask={handleCreateTask}
+                disabled={isCreating}
+            />
+            <div className="grid gap-6">
+            {tasks?.filter(task => !selectedCategoryId || task.category_id === selectedCategoryId).map(task => (
                 <TaskCard
                     key={task.id}
                     task={task}
@@ -81,8 +94,10 @@ function TaskTest() {
                     disabled={isCreating || isUpdating || isDeleting}
                 />
             ))}
-    
         </div>
+
+        </div>
+        
     )
 }
 
