@@ -3,13 +3,21 @@ import { Button } from "../../components/ui/button"
 import { ChevronRight, Plus, Pencil, Trash } from "lucide-react"
 import { useState } from "react"
 import { useTasks } from "../tasks/hooks/useTasks"
+import EditTaskForm from "./EditTaskForm"
+import AddSubtaskForm from "./AddSubtaskForm"
 
 const TaskCard = ({ task, onEdit, onDelete, onAddSubtask, disabled}) => {
 
     const [showSubtasks, setShowSubtasks] = useState(true)
-    const [showSubtaskForm, setShowSubtaskForm] = useState(false)
     const { useSubTaskQuery } = useTasks()
+    const [isEditing, setIsEditing] = useState(false)
+    const [isAddingSubtask, setIsAddingSubtask] = useState(false)
     const {data: subtasksData, isLoading: isSubtasksLoading} = useSubTaskQuery(showSubtasks ? task.id : null)
+
+    const handleEdit = (updateData) => {
+        onEdit({...task, ...updateData})
+        setIsEditing(false)
+    }
 
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString('en-US', {
@@ -30,6 +38,19 @@ const TaskCard = ({ task, onEdit, onDelete, onAddSubtask, disabled}) => {
         }
     }
 
+    if (isEditing) {
+        return (
+            <EditTaskForm
+                task={task}
+                onEdit={handleEdit}
+                onCancel={() => setIsEditing(false)}
+                disabled={disabled}
+                >
+            </EditTaskForm>
+        )
+    }
+
+
     return (
         <div>
             <Card className="w=full max-w-md hover:shadow-lg transition-shadow duration-200">
@@ -47,7 +68,7 @@ const TaskCard = ({ task, onEdit, onDelete, onAddSubtask, disabled}) => {
                         </div>
                         <div className="flex gap-2">
                             <Button 
-                                variant="ghost" size="icon" onClick={() => onEdit(task)} disabled={disabled}>
+                                variant="ghost" size="icon" onClick={() => setIsEditing(!isEditing)} disabled={disabled}>
                                 <Pencil className="h-4 w-4"></Pencil>
                             </Button>
                             <Button variant="ghost" size="icon" onClick={() => onDelete(task)} disabled={disabled}>
@@ -66,7 +87,7 @@ const TaskCard = ({ task, onEdit, onDelete, onAddSubtask, disabled}) => {
                             Due: {formatDate(task.due_date)}
                         </span>
                         <div className="flex gap-2">
-                            <Button variant="outline" size="sm" onClick={() => onAddSubtask(task)} disabled={disabled}>
+                            <Button variant="outline" size="sm" onClick={() => setIsAddingSubtask(true)} disabled={disabled}>
                                 <Plus className="h-4 w-4 mr-1"/>
                                     Add Subtask
                             </Button>
@@ -87,6 +108,18 @@ const TaskCard = ({ task, onEdit, onDelete, onAddSubtask, disabled}) => {
                     </div>
                 </CardContent>
             </Card>
+            {isAddingSubtask && (
+                <AddSubtaskForm
+                    parentTask={task}
+                    onAddSubtask={(newSubTask) => {
+                        onAddSubtask(newSubTask)
+                        setIsAddingSubtask(false)
+                    }}
+                    onCancel={() => setIsAddingSubtask(false)}
+                    disabled={disabled}
+                />
+
+            )}
             {showSubtasks && (
                 <div className="ml-8 mt-4 space-y-4">
                     {isSubtasksLoading ? (

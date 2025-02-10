@@ -34,7 +34,7 @@ function TaskTest({ selectedCategoryId }) {
 
     const handleEdit = (task) => {
         const updates = {
-            title: task.title + ' (edited)',
+            title: task.title,
             description: task.description,
             status: task.status,
             due_date: task.due_date
