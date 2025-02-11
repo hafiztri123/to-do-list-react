@@ -1,11 +1,12 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../components/ui/card"
 import { Button } from "../../components/ui/button"
-import { ChevronRight, Plus, Pencil, Trash, CheckSquare, Square } from "lucide-react"
+import { ChevronRight, Plus, Pencil, Trash, CheckSquare, Square, AlertTriangle } from "lucide-react"
 import { useState } from "react"
 import { useTasks } from "../tasks/hooks/useTasks"
 import {Checkbox} from "../../components/ui/checkbox"
 import EditTaskForm from "./EditTaskForm"
 import AddSubtaskForm from "./AddSubtaskForm"
+import {Alert, AlertDescription} from "../../components/ui/alert"
 
 const TaskCard = ({ task, onEdit, onDelete, onAddSubtask, disabled}) => {
 
@@ -22,6 +23,22 @@ const TaskCard = ({ task, onEdit, onDelete, onAddSubtask, disabled}) => {
             status: newStatus
         });
     };
+
+    const getDueState = (dueDate) => {
+        const now = new Date();
+        const due = new Date(dueDate)
+        const diffDays = Math.ceil((due - now) / (1000 * 60 * 60 * 24));
+
+        if (diffDays < 0) {
+            return { state: 'overdue', color: 'bg-red-100 border-red-300'}
+        } else if (diffDays <= 2 ) {
+            return { state: 'urgent', color: 'bg-yellow-100 border-orange-300'}
+        } else if (diffDays <= 7) {
+            return { state: 'upcoming', color: 'bg-yellow-100 border-yellow-300'}
+        }
+
+        return {state: 'normal', color:''}
+    }
 
     const handleSubtaskSubmit = (subtask) => {
         onAddSubtask(subtask)
@@ -52,6 +69,9 @@ const TaskCard = ({ task, onEdit, onDelete, onAddSubtask, disabled}) => {
         }
     }
 
+    const dueState = getDueState(task.due_date)
+    const isOverdue = dueState.state === 'overdue' && task.status !== 'completed'
+
     if (isEditing) {
         return (
             <EditTaskForm
@@ -67,7 +87,17 @@ const TaskCard = ({ task, onEdit, onDelete, onAddSubtask, disabled}) => {
 
     return (
         <div>
-            <Card className="w=full max-w-md hover:shadow-lg transition-shadow duration-200">
+            <Card className={`w=full max-w-md hover:shadow-lg transition-shadow duration-200 ${isOverdue ? 'border-red-300':''}`}>
+            {(dueState.state === 'urgent' || dueState.state === 'overdue') && task.status !== 'completed' && (
+                    <Alert className={`${dueState.color} border-0 rounded-none rounded-t-lg`}>
+                        <AlertTriangle className="h-4 w-4" />
+                        <AlertDescription>
+                            {dueState.state === 'overdue' 
+                                ? 'This task is overdue!' 
+                                : 'This task is due soon!'}
+                        </AlertDescription>
+                    </Alert>
+                )}
                 <CardHeader className="pb-2">
                     <div className="flex justify-between items-start gap-4">
                         <div className="flex-1 min-w-0">

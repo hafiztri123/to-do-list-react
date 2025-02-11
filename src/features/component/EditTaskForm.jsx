@@ -3,6 +3,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../../comp
 import { Button } from "../../components/ui/button"
 import { Check, X } from "lucide-react"
 import { Input } from "../../components/ui/input"
+import { getMinDate } from "../tasks/utils/dateUtils"
 
 
 
@@ -13,6 +14,8 @@ const EditTaskForm = ({ task, onEdit, onCancel, disabled}) => {
         status: '',
         due_date: '',
     })
+    const [formError, setFormError] = useState('')
+    const minDate = getMinDate()
 
     useEffect(() => {
         if (task) {
@@ -27,6 +30,19 @@ const EditTaskForm = ({ task, onEdit, onCancel, disabled}) => {
 
     const handleSubmit = (e) => {
         e.preventDefault()
+        setFormError('')
+
+        const selectedDate = new Date(formData.due_date)
+        selectedDate.setHours(0,0,0,0)
+        const today = new Date()
+        today.setHours(0,0,0,0)
+
+        if (selectedDate < today) {
+            setFormError('Due date cannot be in the past')
+            return
+        }
+
+
         onEdit({
             ...formData,
             due_date: new Date(formData.due_date).toISOString()
@@ -69,6 +85,7 @@ const EditTaskForm = ({ task, onEdit, onCancel, disabled}) => {
                                     <option value="pending">Pending</option>
                                     <option value="completed">Completed</option>
                                 </select>
+                                <div>
                                 <Input
                                     type="date"
                                     value={formData.due_date}
@@ -77,6 +94,9 @@ const EditTaskForm = ({ task, onEdit, onCancel, disabled}) => {
                                     required
                                     disabled={disabled}
                                 />
+                                {formError && <span className="text-red-500 text-sm">{formError}</span>}
+
+                                </div>
                             </div>
                         </div>
                         <div className="flex gap-2">

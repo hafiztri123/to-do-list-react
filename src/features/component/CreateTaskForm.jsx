@@ -5,6 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../../comp
 import { Input } from "../../components/ui/input"
 import { useCategories } from "../categories/hooks/useCategories"
 import { Alert, AlertDescription } from "../../components/ui/alert"
+import { getMinDate } from "../tasks/utils/dateUtils"
 
 const CreateTaskForm = ({ onCreateTask, disabled }) => {
     const [showForm, setShowForm] = useState(false)
@@ -13,9 +14,23 @@ const CreateTaskForm = ({ onCreateTask, disabled }) => {
     const [dueDate, setDueDate] = useState('')
     const [categoryId, setCategoryId] = useState('')
     const {categories, isLoading: isCategoriesLoading, error: categoriesError} = useCategories() 
+    const [formError, setFormError] = useState('')
+    const minDate = getMinDate()
+
 
     const handleSubmit = (e) => {
         e.preventDefault()
+        setFormError('')
+        
+        const selectedDate = new Date(dueDate)
+        selectedDate.setHours(0,0,0,0)
+        const today = new Date()
+        today.setHours(0,0,0,0)
+
+        if (selectedDate < today) {
+            setFormError('Due date cannot be in the past')
+            return
+        }
         
 
         const task = {
@@ -118,6 +133,12 @@ const CreateTaskForm = ({ onCreateTask, disabled }) => {
                             onChange={(e) => setDueDate(e.target.value)}
                             required
                         />
+                        {formError && (
+                            <span className="text-sm text-red-500">
+                                {formError}
+
+                            </span>
+                        )}
                     </div>
                 </CardContent>
                 <CardFooter>
