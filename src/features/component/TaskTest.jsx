@@ -43,7 +43,6 @@ function TaskTest({ selectedCategoryId }) {
     }
 
     const handleDelete = async (task) => {
-        console.log(task)
         if (window.confirm('Are you sure you want to delete this task?')) {
             try{
                 await deleteTask({taskId: task.id})
@@ -54,14 +53,17 @@ function TaskTest({ selectedCategoryId }) {
     }   
 
     const handleAddSubtask = (task) => {
+
         const newTask = {
-            parent_id: task.id,
-            title: "New Subtask",
-            description: "Description for new subtask",
+            parent_id: task.parent_id,
+            title: task.title,
+            description: task.description,
             due_date: new Date().toISOString(),
             status: "pending",
             category_id: task.category_id
         }
+
+        console.log(newTask)
 
         createTask({ task: newTask })
     }

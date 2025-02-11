@@ -11,9 +11,14 @@ const TaskCard = ({ task, onEdit, onDelete, onAddSubtask, disabled}) => {
     const [showSubtasks, setShowSubtasks] = useState(true)
     const { useSubTaskQuery } = useTasks()
     const [isEditing, setIsEditing] = useState(false)
-    const [isAddingSubtask, setIsAddingSubtask] = useState(false)
+    const [showAddSubTaskForm, setShowAddSubTaskForm] = useState(false)
     const {data: subtasksData, isLoading: isSubtasksLoading} = useSubTaskQuery(showSubtasks ? task.id : null)
 
+    const handleSubtaskSubmit = (subtask) => {
+        onAddSubtask(subtask)
+
+        setShowAddSubTaskForm(false)
+    }
     const handleEdit = (updateData) => {
         onEdit({...task, ...updateData})
         setIsEditing(false)
@@ -87,7 +92,11 @@ const TaskCard = ({ task, onEdit, onDelete, onAddSubtask, disabled}) => {
                             Due: {formatDate(task.due_date)}
                         </span>
                         <div className="flex gap-2">
-                            <Button variant="outline" size="sm" onClick={() => setIsAddingSubtask(true)} disabled={disabled}>
+                            <Button 
+                                variant="outline" 
+                                size="sm" 
+                                onClick={() => setShowAddSubTaskForm(true)} 
+                                disabled={disabled}>
                                 <Plus className="h-4 w-4 mr-1"/>
                                     Add Subtask
                             </Button>
@@ -108,20 +117,16 @@ const TaskCard = ({ task, onEdit, onDelete, onAddSubtask, disabled}) => {
                     </div>
                 </CardContent>
             </Card>
-            {isAddingSubtask && (
-                <AddSubtaskForm
-                    parentTask={task}
-                    onAddSubtask={(newSubTask) => {
-                        onAddSubtask(newSubTask)
-                        setIsAddingSubtask(false)
-                    }}
-                    onCancel={() => setIsAddingSubtask(false)}
-                    disabled={disabled}
-                />
-
-            )}
             {showSubtasks && (
                 <div className="ml-8 mt-4 space-y-4">
+                    {showAddSubTaskForm && (
+                        <AddSubtaskForm
+                            parentTask={task}
+                            onSubmit={handleSubtaskSubmit}
+                            onCancel={() => setShowAddSubTaskForm(false)}
+                            disabled={disabled}
+                        />
+                    )}
                     {isSubtasksLoading ? (
                         <div>Loading subtasks...</div>
                     ) : (
@@ -140,11 +145,14 @@ const TaskCard = ({ task, onEdit, onDelete, onAddSubtask, disabled}) => {
                     )}
 
                 </div>
-            )}
-        </div>
-    )
+                
 
-    
-}
+            )}
+                    
+
+                </div>
+            )}
+
+
 
 export default TaskCard
