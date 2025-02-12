@@ -1,15 +1,15 @@
-import { BASE_HEADERS, fetcher } from "../../tasks/services/taskService";
+import { getHeaders, fetcher } from "../../tasks/services/taskService";
 
 
 export const categoryService = {
     getCategories: async () => {
-        return fetcher('category', { headers: BASE_HEADERS });
+        return fetcher('category', { headers: getHeaders() });
     },
 
     createCategory: async (category) => {
         return fetcher('category', {
             method: 'POST',
-            headers: BASE_HEADERS,
+            headers: getHeaders(),
             body: JSON.stringify(category),
         });
     },
@@ -17,7 +17,7 @@ export const categoryService = {
     deleteCategory: async (categoryid) => {
         return fetcher(`category/${categoryid}`, {
             method: 'DELETE',
-            headers: BASE_HEADERS,
+            headers: getHeaders(),
         });
     },
 

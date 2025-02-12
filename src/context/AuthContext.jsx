@@ -7,9 +7,12 @@ const AuthContext = createContext(null)
 export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'))
     const navigate = useNavigate()
+    
 
     const login = (token) => {
-        localStorage.setItem('token', token)
+        const tokenString = "Bearer " + token
+        localStorage.setItem('token', tokenString)
+
         setIsAuthenticated(true)
         navigate('/tasks')
     }

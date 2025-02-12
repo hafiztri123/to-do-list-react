@@ -1,10 +1,9 @@
-import { BASE_URL, TOKEN } from "../../../constant/api";
+import { BASE_URL} from "../../../constant/api";
 
-export const BASE_HEADERS = {
+export const getHeaders = () => ({
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${TOKEN}`,
-};
-
+    'Authorization': localStorage.getItem('token')
+});
 export async function fetcher(endpoint, options = {}) {
     const response = await fetch(`${BASE_URL}/${endpoint}`, options); 
 
@@ -25,17 +24,17 @@ export async function fetcher(endpoint, options = {}) {
 
 export const taskService = {
     getTasks: async () => {
-        return fetcher('tasks', { headers: BASE_HEADERS });
+        return fetcher('tasks', { headers: getHeaders() });
     },
 
     getSubtasks: async (taskid) => {
-        return fetcher(`tasks/${taskid}/subtasks`, { headers: BASE_HEADERS });
+        return fetcher(`tasks/${taskid}/subtasks`, { headers: getHeaders() });
     },
 
     createTask: async (task) => {
         return fetcher('tasks', {
             method: 'POST',
-            headers: BASE_HEADERS,
+            headers: getHeaders(),
             body: JSON.stringify(task),
         });
     },
@@ -43,7 +42,7 @@ export const taskService = {
     updateTask: async (taskid, updates) => {
         return fetcher(`tasks/${taskid}`, {
             method: 'PUT',
-            headers: BASE_HEADERS,
+            headers: getHeaders(),
             body: JSON.stringify(updates),
         });
     },
@@ -51,7 +50,7 @@ export const taskService = {
     deleteTask: async (taskid) => {
         return fetcher(`tasks/${taskid}`, {
             method: 'DELETE',
-            headers: BASE_HEADERS,
+            headers: getHeaders(),
         });
     }
 };

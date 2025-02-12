@@ -4,6 +4,7 @@ import authWallpaper from "../assets/wallhaven-3k16pd.png"
 import { Input } from "../components/ui/input"
 import googleIcon from "../assets/Google__G__logo.svg.png"
 import {Button} from "../components/ui/button"
+import { motion, AnimatePresence } from "framer-motion"
 
 const AuthPage = () => {
     const [isLogin, setIsLogin] = useState(true)
@@ -13,6 +14,10 @@ const AuthPage = () => {
         password: ''
     })
     const { login, register, loginLoading, registerLoading, formError, setFormError } = useAuth()
+    const handleSwitchForm = () => {
+        setIsLogin(!isLogin)
+        setFormData({name: '', email: '', password: ''})
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault()
