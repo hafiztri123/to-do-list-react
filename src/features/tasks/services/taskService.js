@@ -10,15 +10,17 @@ export async function fetcher(endpoint, options = {}) {
 
     if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(`[${errorData.code}] ${errorData.message}`);
+        console.log(errorData)
+        throw new Error(`${errorData.Message}`);
     }
 
-    // Only try to parse JSON if there's content
+    
+
     if (response.status !== 204) {
         return response.json();
     }
     
-    return null; // For 204 No Content responses
+    return null; 
 }
 
 export const taskService = {

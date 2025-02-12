@@ -12,12 +12,18 @@ export const authService = {
     },
 
     login: async (user) => {
-        return fetcher('auth/login', {
+        const data = await fetcher('auth/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(user)
         })
+
+        if(!data.data){
+            return Error("Invalid credentials")
+        }
+
+        return data.data
     }
 }
