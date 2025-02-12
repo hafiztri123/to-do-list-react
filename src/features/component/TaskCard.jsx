@@ -15,13 +15,17 @@ const TaskCard = ({ task, onEdit, onDelete, onAddSubtask, disabled}) => {
     const [isEditing, setIsEditing] = useState(false)
     const [showAddSubTaskForm, setShowAddSubTaskForm] = useState(false)
     const {data: subtasksData, isLoading: isSubtasksLoading} = useSubTaskQuery(showSubtasks ? task.id : null)
+    const [isAnimating, setIsAnimating] = useState(false)
 
     const handleStatusToggle = () => {
         const newStatus = task.status === 'completed' ? 'pending' : 'completed';
+        setIsAnimating(true)
         onEdit({
             ...task,
             status: newStatus
         });
+
+        setTimeout(() => setIsAnimating(false), 300)
     };
 
     const getDueState = (dueDate) => {
@@ -87,9 +91,11 @@ const TaskCard = ({ task, onEdit, onDelete, onAddSubtask, disabled}) => {
 
     return (
         <div>
-            <Card className={`w=full max-w-md hover:shadow-lg transition-shadow duration-200 ${isOverdue ? 'border-red-300':''}`}>
+            <Card className={`w-full max-w-md transform transition-all duration-200 
+                  hover:shadow-lg hover:-translate-y-1 hover:scale-[1.01]
+                  ${isOverdue ? 'border-red-300' : ''}`}>
             {(dueState.state === 'urgent' || dueState.state === 'overdue') && task.status !== 'completed' && (
-                    <Alert className={`${dueState.color} border-0 rounded-none rounded-t-lg`}>
+                    <Alert className={`${dueState.color} border-0 rounded-none rounded-t-lg `}>
                         <AlertTriangle className="h-4 w-4" />
                         <AlertDescription>
                             {dueState.state === 'overdue' 
@@ -102,7 +108,10 @@ const TaskCard = ({ task, onEdit, onDelete, onAddSubtask, disabled}) => {
                     <div className="flex justify-between items-start gap-4">
                         <div className="flex-1 min-w-0">
                             <div className="flex-1 min-w-0">
-                                <CardTitle className={`text-xl font-semibold break-words ${task.status === 'completed' ? 'line-through text-gray-500': ''}`}>
+                                <CardTitle className={`text-xl font-semibold break-words
+                                    ${task.status === 'completed' ? 'line-through text-gray-500': ''}
+                                    transition-all duration-300 ${isAnimating ? 'scale-95':''}
+                                    `} >
                                     {task.title}
                                 </CardTitle>
                                 <div className="flex items-center gap-2 mt-1">
@@ -188,7 +197,7 @@ const TaskCard = ({ task, onEdit, onDelete, onAddSubtask, disabled}) => {
                 </CardContent>
             </Card>
             {showSubtasks && (
-                <div className="ml-8 mt-4 space-y-4">
+                <div className="ml-8 mt-4 space-y-4 animate-in slide-in-from-left-4 duration-200" >
                     {showAddSubTaskForm && (
                         <AddSubtaskForm
                             parentTask={task}

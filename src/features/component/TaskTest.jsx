@@ -80,12 +80,12 @@ function TaskTest({ selectedCategoryId }) {
 
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 transition-all duration-300">
             <CreateTaskForm
                 onCreateTask={handleCreateTask}
                 disabled={isCreating}
             />
-            <div className="grid gap-6">
+            <div className="grid gap-6 transition-all duration-300" >
             {tasks?.filter(task => !selectedCategoryId || task.category_id === selectedCategoryId).map(task => (
                 <TaskCard
                     key={task.id}

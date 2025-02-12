@@ -16,7 +16,20 @@ const CreateTaskForm = ({ onCreateTask, disabled }) => {
     const {categories, isLoading: isCategoriesLoading, error: categoriesError} = useCategories() 
     const [formError, setFormError] = useState('')
     const minDate = getMinDate()
+    const [isExiting, setIsExiting] = useState(false)
 
+    const handleCancel = () => {
+        setIsExiting(true)
+
+        setTimeout(() => {
+            setIsExiting(false)
+            setShowForm(false)
+            setTitle('')
+            setDescription('')
+            setDueDate('')
+            setCategoryId('')
+        }, 300)
+    }
 
     const handleSubmit = (e) => {
         e.preventDefault()
@@ -74,7 +87,17 @@ const CreateTaskForm = ({ onCreateTask, disabled }) => {
 
 
     return(
-        <Card className="mb-6">
+        <div className="transition-all duration-300">
+            {!showForm ? (
+                <Button
+                    onClick={() => setShowForm(true)}
+                    className='mb-6 animate-in fade-in slide-in-from-left'
+                    >
+                        <Plus className="h-4 w-4 mr-2"/>
+                        Create New Task
+                    </Button>
+            ) : (
+                <Card className={`mb-6 transition-all duration-300 ${isExiting ? 'animate-out fade-out slide-out-to-top' : 'animate-in fade-in slide-in-from-top'}`}>
             <form onSubmit={handleSubmit}>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                     <CardTitle className="text-lg font-medium">Create New Task</CardTitle>
@@ -82,7 +105,7 @@ const CreateTaskForm = ({ onCreateTask, disabled }) => {
                         variant="ghost"
                         size="icon"
                         type="button"
-                        onClick={() => setShowForm(false)}
+                        onClick={handleCancel}
                     >
                         <X className="h-4 w-4"/>
                     </Button>
@@ -151,6 +174,11 @@ const CreateTaskForm = ({ onCreateTask, disabled }) => {
                 </CardFooter>
             </form>
         </Card>
+
+            )}
+
+        </div>
+        
     )
 }
 
